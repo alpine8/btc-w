@@ -13,8 +13,9 @@ def create_wallet(mnemonic):
 
 def display_balance(wallet):
     wallet.utxos_update()  # Update the wallet unspent transaction outputs
-    balance = wallet.balance  # Access the wallet balance
+    balance = wallet.balance()  # Access the wallet balance, add parentheses here
     print(f"Wallet balance: {balance} satoshis")
+
 
 
 def main():
