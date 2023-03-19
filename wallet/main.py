@@ -9,13 +9,13 @@ class BitcoinWalletGeneratorGUI:
     def __init__(self, master):
         self.master = master
         self.master.title("Bitcoin Wallet Generator")
-        
+
         # Create frames for different sections
         self.new_wallet_frame = ttk.LabelFrame(self.master, text="New Wallet")
         self.import_wallet_frame = ttk.LabelFrame(self.master, text="Import Wallet")
         self.balance_frame = ttk.LabelFrame(self.master, text="Balance")
         self.transactions_frame = ttk.LabelFrame(self.master, text="Transactions")
-        
+
         # Add widgets to the new wallet frame
         self.generate_button = ttk.Button(self.new_wallet_frame, text="Generate Wallet", command=self.generate_wallet)
         self.seed_phrase_label = ttk.Label(self.new_wallet_frame, text="Seed Phrase: ")
@@ -23,47 +23,53 @@ class BitcoinWalletGeneratorGUI:
         self.address_label = ttk.Label(self.new_wallet_frame, text="Address: ")
         self.address_entry = ttk.Entry(self.new_wallet_frame, width=50)
         self.qr_code_label = ttk.Label(self.new_wallet_frame)
-        
+
         # Add widgets to the import wallet frame
         self.import_button = ttk.Button(self.import_wallet_frame, text="Import Wallet", command=self.import_wallet)
         self.seed_phrase_import_label = ttk.Label(self.import_wallet_frame, text="Seed Phrase: ")
         self.seed_phrase_import_entry = ttk.Entry(self.import_wallet_frame, width=50)
         self.public_key_import_label = ttk.Label(self.import_wallet_frame, text="Public Key: ")
         self.public_key_import_entry = ttk.Entry(self.import_wallet_frame, width=50)
-        
+
         # Add widgets to the balance frame
         self.balance_button = ttk.Button(self.balance_frame, text="Check Balance", command=self.check_balance)
         self.balance_label = ttk.Label(self.balance_frame, text="Current Balance: ")
         self.balance_value = ttk.Label(self.balance_frame, text="")
-        
+        self.qr_code_label_balance = ttk.Label(self.balance_frame)
+
         # Add widgets to the transactions frame
         self.transactions_button = ttk.Button(self.transactions_frame, text="Check Transactions", command=self.check_transactions)
         self.transactions_label = ttk.Label(self.transactions_frame, text="Last 3 Transactions: ")
         self.transactions_value = ttk.Label(self.transactions_frame, text="")
-        
-        # Pack the widgets into the frames
-        self.new_wallet_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        self.generate_button.pack(padx=5, pady=5)
-        self.seed_phrase_label.pack(padx=5, pady=5)
-        self.seed_phrase_entry.pack(padx=5, pady=5)
-        self.address_label.pack(padx=5, pady=5)
-        self.address_entry.pack(padx=5, pady=5)
-        self.qr_code_label.pack(padx=5, pady=5)
-        self.import_wallet_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        self.import_button.pack(padx=5, pady=5)
-        self.seed_phrase_import_label.pack(padx=5, pady=5)
-        self.seed_phrase_import_entry.pack(padx=5, pady=5)
-        self.public_key_import_label.pack(padx=5, pady=5)
-        self.public_key_import_entry.pack(padx=5, pady=5)
-        self.balance_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        self.balance_button.pack(padx=5, pady=5)
-        self.balance_label.pack(padx=5, pady=5)
-        self.balance_value.pack(padx=5, pady=5)
+        self.qr_code_label_transactions = ttk.Label(self.transactions_frame)
 
-        self.transactions_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-        self.transactions_button.pack(padx=5, pady=5)
-        self.transactions_label.pack(padx=5, pady=5)
-        self.transactions_value.pack(padx=5, pady=5)
+        # Pack the widgets into the frames
+        self.new_wallet_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.generate_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.seed_phrase_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.seed_phrase_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.address_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.address_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
+        self.qr_code_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+
+        self.import_wallet_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        self.import_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.seed_phrase_import_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.seed_phrase_import_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.public_key_import_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.public_key_import_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
+
+        self.balance_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        self.balance_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.balance_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.balance_value.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.qr_code_label_balance.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+        self.transactions_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+        self.transactions_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.transactions_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.transactions_value.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.qr_code_label_transactions.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
     def generate_wallet(self):
         # Generate a new bitcoin wallet using the bitcoinlib library
@@ -83,7 +89,7 @@ class BitcoinWalletGeneratorGUI:
         self.address_entry.insert(0, address)
 
         # Generate and display the QR code
-        self.show_qr_code(address)
+        self.show_qr_code(address, self.qr_code_label)
 
     def check_balance(self):
         # Get the address value from the input field
@@ -99,17 +105,9 @@ class BitcoinWalletGeneratorGUI:
             self.balance_value.config(text=str(balance) + " satoshis")
 
             # Generate the QR code for the address
-            qr_img = qrcode.make(address)
-            qr_img = qr_img.resize((150, 150), Image.ANTIALIAS)
-            self.qr_img_tk = ImageTk.PhotoImage(qr_img)
-
-            # Update the QR code label
-            self.qr_code_label.config(image=self.qr_img_tk)
-            self.qr_code_label.image = self.qr_img_tk
+            self.show_qr_code(address, self.qr_code_label_balance)
         else:
             self.balance_value.config(text="Error checking balance")
-
-
 
     def import_wallet(self):
         # Get the seed phrase and public key values from the input fields
@@ -120,8 +118,7 @@ class BitcoinWalletGeneratorGUI:
             # Generate a seed using the seed phrase
             mnemonic = bitcoinlib.mnemonic.Mnemonic()
             seed = mnemonic.to_seed(seed_phrase)
-
-            # Import a bitcoin wallet using the seed
+                # Import a bitcoin wallet using the seed
             wallet = bitcoinlib.keys.HDKey.from_seed(seed)
 
             # Derive the public key using the path m/44'/0'/0'/0/0 (default for the first Bitcoin address)
@@ -144,11 +141,11 @@ class BitcoinWalletGeneratorGUI:
         self.address_entry.insert(0, address)
 
         # Generate and display the QR code
-        self.show_qr_code(address)
+        self.show_qr_code(address, self.qr_code_label)
 
         self.seed_phrase_import_entry.config(state="normal")
 
-    def show_qr_code(self, address):
+    def show_qr_code(self, address, label):
         # Generate the QR code
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=3, border=4)
         qr.add_data(address)
@@ -156,11 +153,12 @@ class BitcoinWalletGeneratorGUI:
         img = qr.make_image(fill_color="black", back_color="white")
 
         # Convert the QR code image to a PhotoImage
-        self.qr_code_image = ImageTk.PhotoImage(img)
+        qr_code_image = ImageTk.PhotoImage(img)
 
         # Update the QR code label
-        self.qr_code_label.config(image=self.qr_code_image)
-    
+        label.config(image=qr_code_image)
+        label.image = qr_code_image
+
     def check_transactions(self):
         # Get the address value from the input field
         address = self.address_entry.get()
@@ -183,13 +181,7 @@ class BitcoinWalletGeneratorGUI:
             self.transactions_value.config(text=str(transactions))
 
             # Generate the QR code for the address
-            qr_img = qrcode.make(address)
-            qr_img = qr_img.resize((150, 150), Image.ANTIALIAS)
-            self.qr_img_tk = ImageTk.PhotoImage(qr_img)
-
-            # Update the QR code label
-            self.qr_code_label.config(image=self.qr_img_tk)
-            self.qr_code_label.image = self.qr_img_tk
+            self.show_qr_code(address, self.qr_code_label_transactions)
         else:
             self.transactions_value.config(text="Error checking transactions")
 
@@ -199,5 +191,4 @@ if __name__ == "__main__":
     BitcoinWalletGeneratorGUI(root)
     root.mainloop()
 
-
-        
+           
