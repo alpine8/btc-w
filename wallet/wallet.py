@@ -2,21 +2,19 @@ from bitcoinlib.wallets import wallet_create_or_open
 from bitcoinlib.mnemonic import Mnemonic
 
 def generate_mnemonic():
-    mnemonic = Mnemonic().generate()
+    mnemonic = Mnemonic().generate(strength=256)  # Updated this line
     print("Mnemonic seed:", mnemonic)
     return mnemonic
 
 def create_wallet(mnemonic):
     wallet = wallet_create_or_open("my_wallet", keys=mnemonic, network='bitcoin', witness_type='segwit')
-    print("Wallet created with address:", wallet.get_key().address)  # Updated this line
+    print("Wallet created with address:", wallet.get_key().address)
     return wallet
 
 def display_balance(wallet):
     wallet.utxos_update()  # Update the wallet unspent transaction outputs
     balance = wallet.balance()  # Access the wallet balance, add parentheses here
     print(f"Wallet balance: {balance} satoshis")
-
-
 
 def main():
     mnemonic = generate_mnemonic()
