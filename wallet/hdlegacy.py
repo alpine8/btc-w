@@ -10,7 +10,7 @@ from ttkthemes import ThemedTk
 class BitcoinWalletGeneratorGUI:
     def __init__(self, master):
         self.master = master
-        self.master.title("Bitcoin Wallet Generator")
+        self.master.title("btc-w HDLEGACY")
 
         # Create frames for different sections
         self.new_wallet_frame = ttk.LabelFrame(self.master, text="New Wallet")
@@ -21,7 +21,8 @@ class BitcoinWalletGeneratorGUI:
         # Add widgets to the new wallet frame
         self.generate_button = ttk.Button(self.new_wallet_frame, text="Generate Wallet", command=self.generate_wallet)
         self.seed_phrase_label = ttk.Label(self.new_wallet_frame, text="Seed Phrase: ")
-        self.seed_phrase_entry = ttk.Entry(self.new_wallet_frame, width=50)
+        self.seed_phrase_text = tk.Text(self.new_wallet_frame, width=60, height=3, wrap=tk.WORD)
+        self.seed_phrase_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.address_label = ttk.Label(self.new_wallet_frame, text="Address: ")
         self.address_entry = ttk.Entry(self.new_wallet_frame, width=50)
         self.qr_code_label = ttk.Label(self.new_wallet_frame)
@@ -47,7 +48,6 @@ class BitcoinWalletGeneratorGUI:
         self.new_wallet_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.generate_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.seed_phrase_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-        self.seed_phrase_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.address_label.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         self.address_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         self.qr_code_label.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
@@ -81,11 +81,11 @@ class BitcoinWalletGeneratorGUI:
         address = wallet.address()
 
         # Update the seed phrase and address entries with the generated values
-        self.seed_phrase_entry.delete(0, tk.END)
-        self.seed_phrase_entry.insert(0, seed_phrase)
+        self.seed_phrase_text.delete(1.0, tk.END)
+        self.seed_phrase_text.insert(1.0, seed_phrase)
+
         self.address_entry.delete(0, tk.END)
         self.address_entry.insert(0, address)
-
         # Generate and display the QR code
         self.show_qr_code(address, self.qr_code_label)
 
