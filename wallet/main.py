@@ -4,6 +4,8 @@ import bitcoinlib
 import requests
 import qrcode
 from PIL import ImageTk, Image
+from ttkthemes import ThemedTk
+
 
 class BitcoinWalletGeneratorGUI:
     def __init__(self, master):
@@ -35,13 +37,11 @@ class BitcoinWalletGeneratorGUI:
         self.balance_button = ttk.Button(self.balance_frame, text="Check Balance", command=self.check_balance)
         self.balance_label = ttk.Label(self.balance_frame, text="Current Balance: ")
         self.balance_value = ttk.Label(self.balance_frame, text="")
-        self.qr_code_label_balance = ttk.Label(self.balance_frame)
 
         # Add widgets to the transactions frame
         self.transactions_button = ttk.Button(self.transactions_frame, text="Check Transactions", command=self.check_transactions)
         self.transactions_label = ttk.Label(self.transactions_frame, text="Last 3 Transactions: ")
         self.transactions_value = ttk.Label(self.transactions_frame, text="")
-        self.qr_code_label_transactions = ttk.Label(self.transactions_frame)
 
         # Pack the widgets into the frames
         self.new_wallet_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -63,13 +63,11 @@ class BitcoinWalletGeneratorGUI:
         self.balance_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.balance_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.balance_value.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.qr_code_label_balance.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
         self.transactions_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
         self.transactions_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.transactions_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.transactions_value.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.qr_code_label_transactions.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
     def generate_wallet(self):
         # Generate a new bitcoin wallet using the bitcoinlib library
@@ -187,8 +185,8 @@ class BitcoinWalletGeneratorGUI:
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ThemedTk(theme="radiance")  # You can choose other themes like "radiance", "breeze", etc.
     BitcoinWalletGeneratorGUI(root)
     root.mainloop()
 
-           
+
