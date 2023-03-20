@@ -1,4 +1,4 @@
-# btc-w | a basic Bitcoin wallet generator and balance checker
+# btc-w | a basic Bitcoin wallet
 ![ss1](ss1.png)
 ![ss2](ss2.png)
 # built with ChatGPT4
