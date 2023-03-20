@@ -75,7 +75,7 @@ class BitcoinWalletGeneratorGUI:
     def generate_wallet(self):
         # Generate a new bitcoin wallet using the bitcoinlib library
         mnemonic = bitcoinlib.mnemonic.Mnemonic()
-        seed_phrase = mnemonic.generate()
+        seed_phrase = mnemonic.generate(strength=256)
 
         # Generate a new bitcoin wallet using the seed phrase
         wallet = bitcoinlib.keys.HDKey.from_seed(mnemonic.to_seed(seed_phrase))
