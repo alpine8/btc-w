@@ -29,6 +29,12 @@ class BitcoinWalletGeneratorGUI:
         self.address_label = ttk.Label(self.new_wallet_frame, text="Address: ")
         self.address_entry = ttk.Entry(self.new_wallet_frame, width=50)
         self.qr_code_label = ttk.Label(self.new_wallet_frame)
+        self.additional_addresses_frame = ttk.LabelFrame(self.master, text="Additional Receiving Addresses")
+        self.additional_addresses_frame.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+
+        # Add a label to display additional addresses
+        self.additional_addresses_label = ttk.Label(self.additional_addresses_frame, text="", wraplength=400, justify="left")
+        self.additional_addresses_label.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
         # Add widgets to the import wallet frame
         self.import_button = ttk.Button(self.import_wallet_frame, text="Import Wallet", command=self.import_wallet)
@@ -91,6 +97,7 @@ class BitcoinWalletGeneratorGUI:
 
         self.address_entry.delete(0, tk.END)
         self.address_entry.insert(0, address)
+        self.display_additional_addresses(wallet)
 
         # Generate and display the QR code
         self.show_qr_code(address, self.qr_code_label)
@@ -145,6 +152,7 @@ class BitcoinWalletGeneratorGUI:
         # Update the address entry with the imported address value
         self.address_entry.delete(0, tk.END)
         self.address_entry.insert(0, address)
+        self.display_additional_addresses(wallet)
 
         # Generate and display the QR code
         self.show_qr_code(address, self.qr_code_label)
@@ -190,6 +198,16 @@ class BitcoinWalletGeneratorGUI:
             self.show_qr_code(address, self.qr_code_label_transactions)
         else:
             self.transactions_value.config(text="Error checking transactions")
+
+    def display_additional_addresses(self, wallet):
+        additional_addresses = []
+        for index in range(1, 6):  # Display the next 5 receiving addresses
+            key = wallet.subkey_for_path(f"84'/0'/0'/0/{index}")
+            pubkeyhash = key.hash160
+            address = bitcoinlib.encoding.pubkeyhash_to_addr_bech32(pubkeyhash, prefix='bc')
+            additional_addresses.append(address)
+
+        self.additional_addresses_label.config(text="\n".join(additional_addresses))
 
 
 if __name__ == "__main__":
