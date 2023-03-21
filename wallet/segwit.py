@@ -24,10 +24,10 @@ class BitcoinWalletGeneratorGUI:
         # Add widgets to the new wallet frame
         self.generate_button = ttk.Button(self.new_wallet_frame, text="Generate Wallet", command=self.generate_wallet)
         self.seed_phrase_label = ttk.Label(self.new_wallet_frame, text="Seed Phrase: ")
-        self.seed_phrase_text = tk.Text(self.new_wallet_frame, width=60, height=3, wrap=tk.WORD)
+        self.seed_phrase_text = tk.Text(self.new_wallet_frame, width=60, height=3, wrap=tk.WORD,)
         self.seed_phrase_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.address_label = ttk.Label(self.new_wallet_frame, text="Address: ")
-        self.address_entry = ttk.Entry(self.new_wallet_frame, width=50)
+        self.address_entry = ttk.Entry(self.new_wallet_frame, width=50, foreground='black')
         self.qr_code_label = ttk.Label(self.new_wallet_frame)
         self.additional_addresses_frame = ttk.LabelFrame(self.master, text="Additional Receiving Addresses")
         self.additional_addresses_frame.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
@@ -39,9 +39,9 @@ class BitcoinWalletGeneratorGUI:
         # Add widgets to the import wallet frame
         self.import_button = ttk.Button(self.import_wallet_frame, text="Import Wallet", command=self.import_wallet)
         self.seed_phrase_import_label = ttk.Label(self.import_wallet_frame, text="Seed Phrase: ")
-        self.seed_phrase_import_entry = ttk.Entry(self.import_wallet_frame, width=50)
+        self.seed_phrase_import_entry = ttk.Entry(self.import_wallet_frame, width=50, state="normal", foreground="black")
         self.public_key_import_label = ttk.Label(self.import_wallet_frame, text="Public Key: ")
-        self.public_key_import_entry = ttk.Entry(self.import_wallet_frame, width=50)
+        self.public_key_import_entry = ttk.Entry(self.import_wallet_frame, width=50,)
 
         # Add widgets to the balance frame
         self.balance_button = ttk.Button(self.balance_frame, text="Check Balance", command=self.check_balance)
@@ -102,23 +102,32 @@ class BitcoinWalletGeneratorGUI:
         # Generate and display the QR code
         self.show_qr_code(address, self.qr_code_label)
 
+        #to tx
+        self.check_balance()
+        self.check_transactions()
+
+
     def check_balance(self):
         # Get the address value from the input field
         address = self.address_entry.get()
 
-        # Check the balance for a bitcoin address using the blockchain.com API
-        url = f"https://blockchain.info/q/addressbalance/{address}"
+        # Check the balance for a bitcoin address using the blockcypher.com API
+        url = f"https://api.blockcypher.com/v1/btc/main/addrs/{address}/balance"
         response = requests.get(url)
 
         if response.status_code == 200:
+            # Parse the balance in satoshis from the JSON response
+            data = response.json()
+            balance = data['final_balance']
+
             # Show the balance in satoshis
-            balance = int(response.text)
             self.balance_value.config(text=str(balance) + " satoshis")
 
             # Generate the QR code for the address
             self.show_qr_code(address, self.qr_code_label_balance)
         else:
             self.balance_value.config(text="Error checking balance")
+
 
     def import_wallet(self):
         # Get the seed phrase and public key values from the input fields
@@ -158,6 +167,11 @@ class BitcoinWalletGeneratorGUI:
         self.show_qr_code(address, self.qr_code_label)
 
         self.seed_phrase_import_entry.config(state="normal")
+
+        #to tx
+        self.check_balance()
+        self.check_transactions()
+
     
     def show_qr_code(self, address, label):
         # Generate the QR code
@@ -174,22 +188,44 @@ class BitcoinWalletGeneratorGUI:
         label.image = qr_code_image
 
     def check_transactions(self):
+        """
+        Check the last 3 transactions for a bitcoin address using the Blockstream API
+        and update the transactions value label and QR code.
+        """
         # Get the address value from the input field
         address = self.address_entry.get()
 
-        # Check the last 3 transactions for a bitcoin address using the blockchain.com API
-        url = f"https://blockchain.info/rawaddr/{address}"
-        response = requests.get(url)
+        # Check the last 3 transactions for a bitcoin address using the Blockstream API
+        url = f"https://blockstream.info/api/address/{address}/txs"
+
+        try:
+            response = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            self.transactions_value.config(text="Error checking transactions: {}".format(e))
+            return
 
         if response.status_code == 200:
             transactions = []
 
             # Parse the transaction data from the API response
             data = response.json()
-            for tx in data['txs'][:3]:
-                tx_hash = tx['hash']
-                tx_value = sum([o['value'] for o in tx['out'] if o['addr'] == address])
-                transactions.append((tx_hash, tx_value))
+            for tx in data[:3]:
+                tx_hash = tx['txid']
+
+                # Get the transaction details
+                tx_url = f"https://blockstream.info/api/tx/{tx_hash}"
+                try:
+                    tx_response = requests.get(tx_url)
+                except requests.exceptions.RequestException as e:
+                    self.transactions_value.config(text="Error checking transaction details: {}".format(e))
+                    return
+
+                if tx_response.status_code == 200:
+                    tx_data = tx_response.json()
+                    tx_value = sum([o['value'] for o in tx_data['vout'] if o['scriptpubkey_address'] == address])
+                    transactions.append((tx_hash, tx_value))
+                else:
+                    self.transactions_value.config(text="Error checking transaction details")
 
             # Update the transactions value label with the result
             self.transactions_value.config(text=str(transactions))
@@ -198,6 +234,7 @@ class BitcoinWalletGeneratorGUI:
             self.show_qr_code(address, self.qr_code_label_transactions)
         else:
             self.transactions_value.config(text="Error checking transactions")
+
 
     def display_additional_addresses(self, wallet):
         additional_addresses = []
@@ -211,7 +248,7 @@ class BitcoinWalletGeneratorGUI:
 
 
 if __name__ == "__main__":
-    root = ThemedTk(theme="radiance")  # You can choose other themes like "radiance", "breeze", etc.
+    root = ThemedTk(theme="keramik")  # You can choose other themes like "radiance", "breeze", etc.
     BitcoinWalletGeneratorGUI(root)
     root.mainloop()
 
