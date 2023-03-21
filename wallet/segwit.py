@@ -8,7 +8,7 @@ from ttkthemes import ThemedTk
 from bit import Key, PrivateKeyTestnet
 from bitcoinlib.wallets import Wallet
 from bitcoinlib.encoding import addr_bech32_to_pubkeyhash
-
+import threading
 
 class BitcoinWalletGeneratorGUI:
     def __init__(self, master):
@@ -77,6 +77,18 @@ class BitcoinWalletGeneratorGUI:
         self.transactions_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.transactions_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.transactions_value.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+
+        # Add a label to display Bitcoin stats
+        self.bitcoin_stats_frame = ttk.LabelFrame(self.master, text="Bitcoin Stats")
+        self.bitcoin_stats_frame.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
+
+        self.bitcoin_stats_label = ttk.Label(self.bitcoin_stats_frame, text="Loading Bitcoin stats...")
+        self.bitcoin_stats_label.pack()
+
+        # Start a separate thread to update the Bitcoin stats label periodically
+        self.bitcoin_stats_thread = threading.Thread(target=self.update_bitcoin_stats)
+        self.bitcoin_stats_thread.daemon = True
+        self.bitcoin_stats_thread.start()
 
     def generate_wallet(self):
         # Generate a new bitcoin wallet using the bitcoinlib library
@@ -245,6 +257,41 @@ class BitcoinWalletGeneratorGUI:
             additional_addresses.append(address)
 
         self.additional_addresses_label.config(text="\n".join(additional_addresses))
+
+    def update_bitcoin_stats(self):
+        while True:
+            # Get the latest Bitcoin stats from an API
+            url = "https://api.coindesk.com/v1/bpi/currentprice.json"
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                price = data["bpi"]["USD"]["rate"]
+                updated_time = data["time"]["updated"]
+
+                # Get the 24 hour price change and volume from another API
+                url = "https://api.coingecko.com/api/v3/coins/bitcoin"
+                response = requests.get(url)
+                if response.status_code == 200:
+                    data = response.json()
+                    price_change = data["market_data"]["price_change_percentage_24h"]
+                    volume = data["market_data"]["total_volume"]["usd"]
+                    volume_str = f"{volume:,.2f}B USD"
+
+                    # Update the Bitcoin stats label
+                    stats_str = f"Bitcoin Price: {price} USD\n24 Hour Price Change: {price_change:.2f}%\nVolume: {volume_str}\nLast Updated: {updated_time}"
+                    self.bitcoin_stats_label.config(text=stats_str)
+
+                else:
+                    self.bitcoin_stats_label.config(text="Error loading Bitcoin stats")
+
+            else:
+                self.bitcoin_stats_label.config(text="Error loading Bitcoin stats")
+
+            # Update the widget to show the new text
+            self.bitcoin_stats_label.update()
+
+            # Wait for 30 seconds before updating the stats again
+            time.sleep(30)
 
 
 if __name__ == "__main__":
